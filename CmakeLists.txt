@@ -1,0 +1,87 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(My_Tool VERSION 1.0)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+set(Core_Include_Dir ${My_Tool_SOURCE_DIR}/include)
+set(Calibration_Tool_Include_Dir ${My_Tool_SOURCE_DIR}/core/imageTool/calibrationTool)
+set(Image_Tool_Include_Dir ${My_Tool_SOURCE_DIR}/core/imageTool)
+set(AVM_Include_Dir ${My_Tool_SOURCE_DIR}/core/AVM)
+set(OpenGL_Tool_Include_Dir ${CMAKE_SOURCE_DIR}/core/openglTool)
+
+set(Glm_Include_Dir ${My_Tool_SOURCE_DIR}/dependencies)
+set(Stb_Image_Include_Dir ${My_Tool_SOURCE_DIR}/dependencies/stb_image)
+set(OpenCV_DLL_DIR ${CMAKE_SOURCE_DIR}/dependencies/opencv/build/x64/vc16/bin)
+set(CMAKE_PREFIX_PATH ${My_Tool_SOURCE_DIR}/dependencies/opencv/build)
+set(ENV{PATH} ${My_Tool_SOURCE_DIR}/dependencies/opencv/build/x64/vc16/bin)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+
+#opengl dependencies
+set(Opengles_Include_Dir ${CMAKE_SOURCE_DIR}/dependencies/opengles/include)
+set(Opengles_Lib_Dir ${CMAKE_SOURCE_DIR}/dependencies/opengles/lib)
+set(GLFW_Include_Dir ${CMAKE_SOURCE_DIR}/dependencies/glfw/include)
+set(GLFW_Lib_Dir ${CMAKE_SOURCE_DIR}/dependencies/glfw/lib)
+
+
+
+file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/Debug)
+file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/Release)
+file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/MinSizeRel)
+file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH}/RelWithDebInfo)
+
+file(COPY ${My_Tool_SOURCE_DIR}/dependencies/opencv/build/x64/vc16/bin/ DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Debug)
+file(COPY ${My_Tool_SOURCE_DIR}/dependencies/opencv/build/x64/vc16/bin/ DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Release)
+file(COPY ${My_Tool_SOURCE_DIR}/dependencies/opencv/build/x64/vc16/bin/ DESTINATION ${EXECUTABLE_OUTPUT_PATH}/MinSizeRel)
+file(COPY ${My_Tool_SOURCE_DIR}/dependencies/opencv/build/x64/vc16/bin/ DESTINATION ${EXECUTABLE_OUTPUT_PATH}/RelWithDebInfo)
+
+
+#copy opengles dll
+file(COPY ${CMAKE_SOURCE_DIR}/dependencies/opengles/dll/ DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Debug)
+file(COPY ${CMAKE_SOURCE_DIR}/dependencies/opengles/dll/ DESTINATION ${EXECUTABLE_OUTPUT_PATH}/Release)
+file(COPY ${CMAKE_SOURCE_DIR}/dependencies/opengles/dll/ DESTINATION ${EXECUTABLE_OUTPUT_PATH}/MinSizeRel)
+file(COPY ${CMAKE_SOURCE_DIR}/dependencies/opengles/dll/ DESTINATION ${EXECUTABLE_OUTPUT_PATH}/RelWithDebInfo)
+
+configure_file(Config.h.in Config.h)
+# set(OpenCV_STATIC ON)
+set(OpenCV_DIR ${CMAKE_SOURCE_DIR}/dependencies/opencv)
+find_package(OpenCV REQUIRED)
+
+add_subdirectory(core)
+link_directories(${Opengles_Lib_Dir} ${GLFW_Lib_Dir})
+
+add_executable(My_Tool main.cpp)
+target_include_directories(My_Tool PUBLIC 
+			${Core_Include_Dir}
+			${Glm_Include_Dir}
+			${Stb_Image_Include_Dir}
+			${PROJECT_BINARY_DIR}
+			${Calibration_Tool_Include_Dir}
+			${Image_Tool_Include_Dir}
+			${AVM_Include_Dir}
+			${OpenCV_INCLUDE_DIRS}
+			${GLFW_Include_Dir}
+			${Opengles_Include_Dir}
+			${OpenGL_Tool_Include_Dir}
+			)
+target_include_directories(Core PUBLIC 
+						${PROJECT_BINARY_DIR}
+						${Core_Include_Dir}
+						${Glm_Include_Dir}
+						${Stb_Image_Include_Dir}
+						${Calibration_Tool_Include_Dir}
+						${Image_Tool_Include_Dir}
+						${AVM_Include_Dir}
+						${OpenCV_INCLUDE_DIRS}
+						${GLFW_Include_Dir}
+						${Opengles_Include_Dir}
+						${OpenGL_Tool_Include_Dir}
+						)
+
+target_link_libraries(My_Tool PUBLIC Core ${OpenCV_LIBS} 
+						libMaliEmulator libGLESv2 libEGL glfw3
+			)
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+

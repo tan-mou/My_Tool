@@ -1,0 +1,12 @@
+aux_source_directory(. Core_Lib)
+aux_source_directory(imageTool/calibrationTool Calibration_Tool_Lib)
+aux_source_directory(imageTool Image_Tool_Lib)
+aux_source_directory(AVM AVM_Lib)
+aux_source_directory(openglTool openGL_Tool_Lib)
+add_library(Core 
+		 ${Core_Lib}
+		${Image_Tool_Lib}
+		${Calibration_Tool_Lib}
+		${AVM_Lib}
+		${openGL_Tool_Lib}
+		)
